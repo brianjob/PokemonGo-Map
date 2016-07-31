@@ -1071,7 +1071,7 @@ function changeLocation(lat, lng) {
 }
 
 function changeSearchLocation(lat, lng) {
-  //return $.post("next_loc?lat=" + lat + "&lon=" + lng, {});
+  return $.post("next_loc?lat=" + lat + "&lon=" + lng, {});
 }
 
 function centerMap(lat, lng, zoom) {
@@ -1171,11 +1171,11 @@ $(function() {
         //the search function makes any small movements cause a loop. Need to increase resolution
         if (getPointDistance(marker.getPosition(), (new google.maps.LatLng(lat, lon))) > 40) {
             console.log('blocking location change');
-          // $.post(baseURL + "/next_loc?lat=" + lat + "&lon=" + lon).done(function() {
-          //   var center = new google.maps.LatLng(lat, lon);
-          //   map.panTo(center);
-          //   marker.setPosition(center);
-          // });
+            $.post(baseURL + "/next_loc?lat=" + lat + "&lon=" + lon).done(function() {
+               var center = new google.maps.LatLng(lat, lon);
+               map.panTo(center);
+               marker.setPosition(center);
+           });
         }
       });
     }
