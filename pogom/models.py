@@ -8,6 +8,7 @@ from peewee import Model, MySQLDatabase, SqliteDatabase, InsertQuery,\
                    IntegerField, CharField, DoubleField, BooleanField,\
                    DateTimeField, OperationalError
 from playhouse.shortcuts import RetryOperationalError
+from pymysql import InternalError
 from datetime import datetime, timedelta
 from base64 import b64encode
 
@@ -335,7 +336,7 @@ def bulk_upsert(cls, data):
         log.debug("Inserting items {} to {}".format(i, min(i+step, num_rows)))
         try:
             InsertQuery(cls, rows=data.values()[i:min(i+step, num_rows)]).upsert().execute()
-        except OperationalError as e:
+        except (OperationalError, InternalError) as e:
             log.warning("%s... Retrying", e)
             continue
 
