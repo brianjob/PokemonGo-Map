@@ -12,11 +12,11 @@ from s2sphere import *
 from pogom.utils import get_args
 
 from . import config
-from .models import Pokemon, Gym, Pokestop, ScannedLocation
+from .models import Pokemon, Gym, Pokestop, ScannedLocation, init_database
 
 log = logging.getLogger(__name__)
 compress = Compress()
-
+db = init_database()
 
 class Pogom(Flask):
     def __init__(self, import_name, **kwargs):
@@ -28,6 +28,18 @@ class Pogom(Flask):
         self.route("/loc", methods=['GET'])(self.loc)
         self.route("/next_loc", methods=['POST'])(self.next_loc)
         self.route("/mobile", methods=['GET'])(self.list_pokemon)
+        self.before_request(self._before_request)
+        self.after_request(self._after_request)
+
+    def _before_request(self):
+        log.debug('Opening db connection: %s', db)
+        db.connect()
+
+    def _after_request(self, response):
+        log.debug('Closing db connection: %s', db)
+        db.close()
+        return response
+
 
     def fullmap(self):
         args = get_args()
